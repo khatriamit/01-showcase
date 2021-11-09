@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# EXPORT LANGUAGES
+source /etc/profile.d/lang.sh
+export LANG='en_US.UTF-8'
+export LC_ALL='en_US.UTF-8'
+
+# INSTALL DEPENDENCIES
+yum install -y zlib-devel epel-release python3 python3-devel httpd-devel
+yum -y groupinstall development
+yum update -y
+yum install -y mod_ssl
+
+# COPY VirtualHost CONF
+sudo cp /var/www/backend/backend.conf /etc/httpd/conf.d/backend.conf
+
+#15.08.2020 Not required to copy certs , as this is now managed automatically by certbot which will autorenew certs every  90 days
+# COPY certificate and modify permission
+#sudo cp /var/www/backend/letsencrypt/api.stg.backend.com.au.crt /etc/pki/tls/certs/api.stg.backend.com.au.crt
+#sudo chown root:root /etc/pki/tls/certs/api.stg.backend.com.au.crt
+#sudo chmod 600 /etc/pki/tls/certs/api.stg.backend.com.au.crt
+
+
+# COPY CA certificate and modify permission
+#sudo cp /var/www/backend/letsencrypt/ca-bundle-zero.crt /etc/pki/tls/certs/ca-bundle-zero.crt
+#sudo chown root:root /etc/pki/tls/certs/ca-bundle-zero.crt
+#sudo chmod 600 /etc/pki/tls/certs/ca-bundle-zero.crt
+
+# COPY private key and modify permission
+#sudo cp /var/www/backend/letsencrypt/custom.key /etc/pki/tls/private/custom.key
+#sudo chown root:root /etc/pki/tls/private/custom.key
+#sudo chmod 600 /etc/pki/tls/private/custom.key
+
+# COPY ssl.conf
+#sudo cp /var/www/backend/letsencrypt/ssl.conf /etc/httpd/conf.d/ssl.conf
+
+# BUILD MOD_WSGI AND INSTALL
+wget "https://github.com/GrahamDumpleton/mod_wsgi/archive/4.5.14.tar.gz"
+tar -xzf '4.5.14.tar.gz'
+cd ./mod_wsgi-4.5.14
+./configure --with-python=/usr/bin/python3.7
+make
+make install
+cd ..
+rm -rf mod_wsgi-4.5.14
+rm 4.5.14.tar.gz

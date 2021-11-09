@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# OWN backend directory
+command sudo chown -R $USER:$USER /var/www/backend
+command sudo chmod -R 777 /var/www/backend/media
+command python3 --version
+
+# CREATE python3 ENVIROMENT
+isEnv=`ls /var/www/backend/  | grep 'venv'`
+if [[ ! $isEnv ]];then
+  cd /var/www/backend
+  command python3 -m venv venv
+  command ls
+fi
+
+# ACTIVATE ENVIROMENT AND INSTALL REQUIREMENTS
+command source /var/www/backend/venv/bin/activate
+command pip3 install -r /var/www/backend/requirements.txt
+command pip3 list
+cd /var/www/backend
+command python3 manage.py makemigrations
+command python3 manage.py migrate
+#collectstatic is needed only on the first run
+command python3 manage.py collectstatic --noinput
+#command echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin@backend.com', 'interOP@123')" | python3 manage.py shell
